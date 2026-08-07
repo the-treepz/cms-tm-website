@@ -37,6 +37,7 @@
 <meta name="twitter:description" content="transportation,logistics, Rent Vehicles.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com">
+<script src="https://cdn.tailwindcss.com"></script>
 <style>/* vietnamese */
 @font-face {
   font-family: 'MuseoModerno';
@@ -299,6 +300,12 @@
     [data-stats-grid],[data-leaders-grid],[data-affil-grid],[data-pillars-grid],
     [data-steps-grid],[data-coop-groups],[data-ilo-grid]{ grid-template-columns:repeat(2,1fr) !important; }
     [data-product-tabs]{ position:static !important; top:auto !important; flex-direction:row !important; flex-wrap:wrap !important; }
+    [data-blog-featured]{ margin:20px 0 28px !important; border-radius:20px !important; }
+    [data-blog-featured-inner]{ grid-template-columns:1fr !important; min-height:auto !important; }
+    [data-blog-featured-cover]{ height:380px !important; }
+    [data-blog-featured-body]{ padding:26px 24px !important; gap:18px !important; }
+    [data-blog-featured-title]{ font-size:24px !important; padding:18px !important; padding-bottom:28px !important; }
+    [data-blog-pagination]{ justify-content:center !important; }
   }
   @media (max-width: 640px){
     section{ padding:72px 22px !important; }
@@ -313,6 +320,11 @@
     [data-ilo-grid],[data-footer-grid],[data-form2]{ grid-template-columns:1fr !important; }
     [data-footer-grid]{ gap:28px !important; }
     [data-mv-grid]{ grid-template-columns:1fr !important; }
+    [data-blog-featured]{ margin:16px 0 22px !important; border-radius:16px !important; }
+    [data-blog-featured-cover]{ height:260px !important; }
+    [data-blog-featured-body]{ padding:20px 18px !important; gap:16px !important; }
+    [data-blog-featured-title]{ font-size:20px !important; letter-spacing:-0.3px !important; padding:14px !important; padding-bottom:22px !important; }
+    [data-blog-pagination]{ gap:14px !important; padding-top:22px !important; margin-top:14px !important; }
   }
 </style>
 </helmet>
@@ -612,10 +624,7 @@
       </div>
     </div>
   </section>
-
   <!-- ================= VISIT US ================= -->
-
-
   <section ref="{{ cardRef }}" style="background:#FFFFFF;padding:110px 40px;">
     <div style="max-width:1200px;margin:0 auto;display:grid;grid-template-columns:1fr;gap:32px;align-items:start;">
       <div data-reveal="" style="animation:revealIn .85s cubic-bezier(.16,1,.3,1) both;animation-timeline:view();animation-range:entry 0% entry 42%;max-width:560px;">
@@ -715,8 +724,6 @@
       <button sc-camel-on-click="{{ openDriver }}" style="background:#FBC02D;border:none;cursor:pointer;font-family:Urbanist;font-weight:700;font-size:16px;color:#0A1F18;padding:17px 30px;border-radius:14px;box-shadow:0 14px 34px -12px rgba(251,192,45,0.5);" style-hover="transform:translateY(-2px);">Register as a TMO X Driver →</button>
     </div>
   </section>
-
-  
 
   </sc-if>
 
@@ -914,40 +921,41 @@
         <div id="blogEmptyNotice" style="display:none;border:1px solid rgba(60,179,113,0.25);border-radius:16px;padding:22px 24px;color:rgba(255,255,255,0.78);font-family:Urbanist;font-size:14.5px;background:rgba(10,42,31,0.6);">
           No dispatches yet — check back soon for updates from the corridor.
         </div>
-
         <!-- Featured card (first post) -->
-        <div id="blogFeatured" style="display:none;margin:28px 0 36px;border-radius:24px;overflow:hidden;background:#0A1F18;border:1px solid rgba(60,179,113,0.28);">
-          <div id="blogFeaturedInner" style="display:grid;grid-template-columns:1.15fr 1fr;gap:0;min-height:320px;">
-            <a id="blogFeaturedCoverHref" href="#" style="display:block;position:relative;height:660px;background:linear-gradient(135deg,#104636,#0A1F18);text-decoration:none;">
+        <div id="blogFeatured" data-blog-featured=""  style="display:none;margin:28px 0 36px;border-radius:24px;overflow:hidden;background:#0A1F18;border:1px solid rgba(60,179,113,0.28);" >
+          <div id="blogFeaturedInner" data-blog-featured-inner="" style="display:grid;grid-template-columns:1.15fr 1fr;gap:0;min-height:320px;" class="lg:flex block">
+            <a id="blogFeaturedCoverHref" href="#" data-blog-featured-cover="" style="display:block;position:relative;height:660px;background:linear-gradient(135deg,#104636,#0A1F18);text-decoration:none;" class="lg:hidden">
               <img id="blogFeaturedCover" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" />
               <div id="blogFeaturedBar" style="position:absolute;top:20px;left:20px;display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;background:#FBC02D;color:#0A1F18;font-family:Urbanist;font-weight:800;font-size:12px;letter-spacing:0.5px;">FEATURED</div>
-              <h3 id="blogFeaturedTitle" style="position: absolute;bottom: 0px;padding: 20px;padding-bottom: 40px; left: 0px;font-family:MuseoModerno;font-weight:800;font-size:28px;line-height:1.08;letter-spacing:-0.7px;color:#fff;margin:0 0 14px;">—</h3>
             </a>
-            <div id="blogFeaturedBody" style="padding:34px 32px;display:flex;flex-direction:column;justify-content:space-between;gap:22px;">
+            <div id="blogFeaturedBody" data-blog-featured-body="" style="padding:34px 32px;display:flex;flex-direction:column;justify-content:space-between;gap:22px;" class="">
               <div>
                 <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:18px;">
                   <span id="blogFeaturedTag" style="display:inline-flex;padding:6px 10px;border-radius:999px;background:rgba(60,179,113,0.14);color:#7FE0AC;font-family:Urbanist;font-weight:700;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;border:1px solid rgba(60,179,113,0.3);">NEWS</span>
                   <span id="blogFeaturedDate" style="color:rgba(255,255,255,0.62);font-family:Urbanist;font-size:13px;">—</span>
                   <span id="blogFeaturedViews" style="margin-left:auto;color:rgba(255,255,255,0.5);font-family:Urbanist;font-size:12.5px;">—</span>
                 </div>
-                
+              <div id="blogFeaturedTitle" data-blog-featured-title="" style="padding: 20px; font-family:MuseoModerno;font-weight:800;font-size:28px;line-height:1.08;letter-spacing:-0.7px;color:#fff;margin:0 0 14px;" >—</div>
                 <p id="blogFeaturedExcerpt" style="font-family:Urbanist;font-size:15.5px;line-height:1.62;color:rgba(255,255,255,0.72);margin:0;">—</p>
               </div>
-              <div style="display:flex;align-items:center;gap:12px;">
+              
+            </div>
+          </div>
+        <p id="blogFeaturedExcerpt2" class="text-white px-[24px] pt-[24px]"></p>
+        <hr class="bg-white/50 my-[10px]"/>
+        <div style="display:flex;align-items:center;gap:12px;" class="text-white px-[24px] pb-[30px]">
                 <img id="blogFeaturedAvatar" alt="" style="width:40px;height:40px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,0.06);" />
                 <div>
                   <div id="blogFeaturedAuthor" style="font-family:Urbanist;font-weight:700;font-size:14px;color:#fff;">—</div>
                   <div style="font-family:Urbanist;font-size:12.5px;color:rgba(255,255,255,0.5);">Correspondent</div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
+      </div>
 
         <!-- All-post grid -->
-        <div id="blogGrid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;"></div>
+        <div id="blogGrid" data-blogcards-grid="" style="display:grid;grid-template-columns:repeat(3,1fr);gap:22px;"></div>
         <!-- Pagination (bottom of blog listing) -->
-       <div id="blogPagination" style="display:none;margin-top:20px;padding-top:30px;border-top:1px dashed rgba(255,255,255,0.08);align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap; width: 100%;">
+       <div id="blogPagination" data-blog-pagination="" style="display:none;margin-top:20px;padding-top:30px;border-top:1px dashed rgba(255,255,255,0.08);align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap; width: 100%;">
           <button id="blogPrevPage" type="button" style="display:inline-flex;align-items:center;gap:10px;padding:12px 18px;border-radius:14px;border:1px solid rgba(60,179,113,0.3);background:rgba(10,42,31,0.6);color:#fff;font-family:Urbanist;font-weight:700;font-size:14px;cursor:pointer;transition:border-color .2s ease, transform .2s ease;">← Previous</button>
           <div id="blogPages" style="display:flex;align-items:center;gap:12px;flex:1;justify-content:center;flex-wrap:wrap;">
             <span id="blogPageInfo" style="font-family:Urbanist;font-weight:700;font-size:14px;color:#fff;">—</span>
@@ -973,7 +981,7 @@
     const a = document.createElement('a');
     a.href = p.href || '#';
     a.dataset.blogIdx = String(i);
-    a.style.cssText = 'display:block;text-decoration:none;color:inherit;background:#0A1F18;border:1px solid rgba(60,179,113,0.2);border-radius:20px;overflow:hidden;transition:transform .2s ease,border-color .2s ease;';
+    a.style.cssText = 'text-decoration:none;color:inherit;background:#0A1F18;border:1px solid rgba(60,179,113,0.2);border-radius:20px;overflow:hidden;transition:transform .2s ease,border-color .2s ease;';
     a.addEventListener('mouseenter',()=>{ a.style.transform='translateY(-3px)'; a.style.borderColor = p.bar || 'rgba(60,179,113,0.55)'; });
     a.addEventListener('mouseleave',()=>{
       a.style.transform='';
@@ -1106,10 +1114,12 @@
     }
     if(coverWrap){ coverWrap.style.display = hasCover ? 'block' : 'none'; }
     if(bar){ bar.style.display = hasCover ? 'inline-flex' : 'none'; }
-    if(body){ body.style.padding = hasCover ? '34px 32px' : '42px 44px'; }
+    if(body){ 
+      body.style.padding = hasCover ? '34px 32px' : '42px 44px'; 
+    }
     const H=(id,f)=>{ const n=$(id); if(!n) return; try{ f(n); }catch(e){} };
     H('blogFeaturedCoverHref',n=> n.href = p.href||'#');
-    H('blogFeaturedCover',     n=>{
+    H('blogFeaturedCover', n=>{
       if(hasCover){
         n.src=p.cover;
         n.style.visibility='visible';
@@ -1125,7 +1135,13 @@
     H('blogFeaturedViews',     n=> n.textContent=p.views?p.views+' views':'');
     H('blogFeaturedTitleHref', n=> n.href=p.href||'#');
     H('blogFeaturedTitle',     n=> n.textContent=p.title||'Untitled');
-    H('blogFeaturedExcerpt',   n=>{ n.textContent = (p.fullExcerpt||p.excerpt||''); });
+    H('blogFeaturedExcerpt',   n=>{ 
+      n.innerHTML = (p.fullExcerpt || p.excerpt || '').substring(0,903);
+    });
+    H('blogFeaturedExcerpt2',   n=>{ 
+      const excerpt = (p.fullExcerpt || p.excerpt || '');
+      n.innerHTML = excerpt.substring(880,excerpt.length);
+    });
     H('blogFeaturedAvatar',    n=>{ if(p.avatar) n.src=p.avatar; else try{ n.removeAttribute('src'); }catch(e){} });
     H('blogFeaturedAuthor',    n=> n.textContent=p.author||'CMS T&M');
   }
