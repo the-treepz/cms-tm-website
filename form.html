@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Suggest a Route — CMS T&amp;M x TMO</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=MuseoModerno:wght@700;800&family=Urbanist:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tmoBg:      '#F5E6C8',
+            tmoCard:    '#FFFFFF',
+            tmoInk:     '#0A1F18',
+            tmoInkSoft: '#1B3A30',
+            tmoMuted:   '#6B7C74',
+            tmoLine:    '#E8E4D8',
+            tmoAccent:  '#F6C54A',
+            tmoAccentD: '#E7B136',
+            tmoGold:    '#FBC02D',
+            tmoOk:      '#3CB371',
+          },
+          fontFamily: {
+            display: ['MuseoModerno', 'system-ui', 'sans-serif'],
+            body:    ['Urbanist', 'system-ui', 'sans-serif'],
+          },
+          boxShadow: {
+            soft: '0 20px 60px -24px rgba(10, 31, 24, 0.18), 0 4px 14px -6px rgba(10, 31, 24, 0.06)',
+            ringGold: '0 0 0 6px rgba(246, 197, 74, 0.20)',
+          },
+          borderRadius: {
+            xl2: '22px',
+            xl3: '28px',
+          },
+          keyframes: {
+            popIn: { '0%': { opacity: 0, transform: 'translateY(6px) scale(.98)' }, '100%': { opacity: 1, transform: 'translateY(0) scale(1)' } },
+            shake: { '0%,100%': { transform: 'translateX(0)' }, '25%': { transform: 'translateX(-4px)' }, '75%': { transform: 'translateX(4px)' } },
+          },
+          animation: {
+            popIn: 'popIn .35s cubic-bezier(.2,.9,.25,1.2) both',
+            shake: 'shake .35s ease',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Accent ring when input focused (Tailwind focus:within only covers outline) */
+    .tmo-input:focus-within {
+      border-color: rgba(246,197,74,0.85) !important;
+      box-shadow: 0 0 0 4px rgba(246,197,74,0.18);
+      background: #fff;
+    }
+    .tmo-input input::placeholder { color: #B5B0A0; }
+    .tmo-pill { transition: all .18s ease; }
+    .tmo-pill:hover  { border-color: rgba(246,197,74,0.55); background: rgba(246,197,74,0.04); }
+    .tmo-pill[data-active="true"] {
+      border-color: #0A1F18;
+      background: rgba(10,31,24,0.04);
+      box-shadow: inset 0 0 0 1.5px #0A1F18;
+    }
+    .tmo-pill[data-active="true"] .pill-check { opacity: 1; transform: scale(1); }
+    .pill-check { opacity: 0; transform: scale(.6); transition: all .18s cubic-bezier(.2,.9,.3,1.4); }
+    #submitBtn { transition: transform .08s ease, background .2s ease, box-shadow .2s ease; }
+    #submitBtn:not(:disabled):hover   { background: #F3BC35; }
+    #submitBtn:not(:disabled):active  { transform: translateY(1px) scale(.995); }
+    /* Remove number input spinners */
+    input[type=tel]::-webkit-outer-spin-button,
+    input[type=tel]::-webkit-inner-spin-button { -webkit-appearance: none; appearance: none; margin: 0; }
+    input[type=tel]{ -moz-appearance: textfield; appearance: textfield; }
+  </style>
+</head>
+<body class="min-h-screen w-full bg-tmoBg font-body text-tmoInk antialiased selection:bg-tmoAccent/40">
+  <!-- Ambient decorative gradient glow -->
+  <div aria-hidden="true" class="pointer-events-none fixed -top-24 -left-24 h-[340px] w-[340px] rounded-full bg-tmoAccent/35 blur-3xl"></div>
+  <div aria-hidden="true" class="pointer-events-none fixed -bottom-24 -right-24 h-[340px] w-[340px] rounded-full bg-tmoOk/25 blur-3xl"></div>
+
+  <main class="relative z-10 mx-auto flex min-h-screen w-full max-w-6xl items-center justify-center px-4 py-10 sm:px-6 sm:py-16">
+    <!-- Suggest a route card -->
+    <section id="routeFormCard"
+             aria-labelledby="suggestHeading"
+             class="w-full max-w-[900px] overflow-hidden rounded-xl3 bg-tmoCard p-6 shadow-soft ring-1 ring-black/5 animate-popIn sm:p-10 lg:p-12">
+      <header class="mb-8 sm:mb-10">
+        <div class="mb-3 inline-flex items-center gap-2 rounded-full bg-tmoAccent/15 px-3 py-1.5">
+          <span aria-hidden="true" class="grid h-5 w-5 place-items-center rounded-full bg-tmoAccent text-tmoInk font-bold text-[11px] leading-none">✦</span>
+          <span class="font-body text-[12px] font-800 tracking-wide text-tmoInkSoft uppercase">Route Expansion</span>
+        </div>
+        <div id="suggestHeading"
+          class="font-display text-[30px] font-extrabold leading-[1.02] tracking-[-1.6px] text-tmoInk sm:text-[34px]">
+          Suggest a route
+        </div>
+        <p class="mt-3 max-w-xl font-body text-[17px] leading-relaxed text-tmoMuted sm:text-[18px]">
+          Tell us where to expand next.
+        </p>
+      </header>
+      <form 
+      id="suggestRouteForm"
+       novalidate autocomplete="on" class="space-y-7 sm:space-y-8">
+        <!-- Row 1: Full Name + Phone -->
+        <div class="grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+          <div>
+            <label for="fullName" class="mb-2.5 block font-body text-[15px] font-bold text-tmoInk">Full Name</label>
+            <div class="tmo-input rounded-2xl border border-tmoLine bg-[#FCFBF6] px-4 py-[15px] transition-all">
+              <input id="fullName" name="fullName" type="text" required maxlength="120"
+                     placeholder="Your name"
+                     class="w-full border-none bg-transparent p-0 font-body text-[16px] text-tmoInk placeholder:text-[#B5B0A0] outline-none focus:ring-0"/>
+            </div>
+            <p data-err-for="fullName" class="mt-1.5 hidden font-body text-[12.5px] font-semibold text-red-500"></p>
+          </div>
+
+          <div>
+            <label for="phone" class="mb-2.5 block font-body text-[15px] font-bold text-tmoInk">Phone</label>
+            <div class="tmo-input flex items-center gap-2.5 rounded-2xl border border-tmoLine bg-[#FCFBF6] px-4 py-[15px] transition-all">
+              <span class="select-none font-body text-[15px] font-bold text-tmoMuted">🇳🇬&nbsp;+234</span>
+              <span class="h-6 w-px bg-tmoLine"></span>
+              <input id="phone" name="phone" type="tel" required inputmode="tel" maxlength="14"
+                     placeholder="0913 446 6287"
+                     class="w-full min-w-0 border-none bg-transparent p-0 font-body text-[16px] text-tmoInk placeholder:text-[#B5B0A0] outline-none focus:ring-0"/>
+            </div>
+            <p data-err-for="phone" class="mt-1.5 hidden font-body text-[12.5px] font-semibold text-red-500"></p>
+          </div>
+        </div>
+
+        <!-- Row 2: Route start + Route end -->
+        <div class="grid grid-cols-1 gap-x-6 gap-y-7 sm:grid-cols-2">
+          <div>
+            <label for="routeStart" class="mb-2.5 flex items-center gap-2 font-body text-[15px] font-bold text-tmoInk">
+              <span class="grid h-5 w-5 place-items-center rounded-full bg-tmoAccent/20 text-tmoInk text-[11px] leading-none">◉</span>
+              Route starts at
+            </label>
+            <div class="tmo-input rounded-2xl border border-tmoLine bg-[#FCFBF6] px-4 py-[15px] transition-all">
+              <input id="routeStart" name="routeStart" type="text" required maxlength="90"
+                     placeholder="e.g. Ikorodu"
+                     class="w-full border-none bg-transparent p-0 font-body text-[16px] text-tmoInk placeholder:text-[#B5B0A0] outline-none focus:ring-0"/>
+            </div>
+            <p data-err-for="routeStart" class="mt-1.5 hidden font-body text-[12.5px] font-semibold text-red-500"></p>
+          </div>
+
+          <div>
+            <label for="routeEnd" class="mb-2.5 flex items-center gap-2 font-body text-[15px] font-bold text-tmoInk">
+              <span class="grid h-5 w-5 place-items-center rounded-full bg-tmoOk/20 text-tmoOk text-[11px] leading-none">◉</span>
+              Route ends at
+            </label>
+            <div class="tmo-input rounded-2xl border border-tmoLine bg-[#FCFBF6] px-4 py-[15px] transition-all">
+              <input id="routeEnd" name="routeEnd" type="text" required maxlength="90"
+                     placeholder="e.g. CMS Marina"
+                     class="w-full border-none bg-transparent p-0 font-body text-[16px] text-tmoInk placeholder:text-[#B5B0A0] outline-none focus:ring-0"/>
+            </div>
+            <p data-err-for="routeEnd" class="mt-1.5 hidden font-body text-[12.5px] font-semibold text-red-500"></p>
+          </div>
+        </div>
+
+        <!-- Row 3: Pay question with 2 pills -->
+        <div>
+          <fieldset>
+            <legend class="mb-3 block font-body text-[15px] font-bold text-tmoInk sm:text-[16px]">
+              Would you subscribe and pay if TMO expands here?
+            </legend>
+            <input type="hidden" name="wouldPay" id="wouldPay" value="" required />
+
+            <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">
+              <button type="button"
+                      data-pill-value="yes"
+                      role="radio"
+                      aria-checked="false"
+                      class="tmo-pill group relative flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-tmoLine bg-[#FCFBF6] px-5 py-4 font-body text-[18px] font-bold text-tmoInkSoft select-none focus:outline-none focus:ring-4 focus:ring-tmoAccent/25 sm:py-5 sm:text-[19px]">
+                <svg class="pill-check h-4 w-4 shrink-0 text-tmoInk" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M4 10.5l3.5 3.5L16 5.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Yes, I'd pay
+                <span class="pointer-events-none absolute right-3 top-3 hidden h-6 items-center gap-1 rounded-full bg-tmoOk/15 px-2 py-0.5 font-body text-[10.5px] font-extrabold uppercase tracking-wider text-tmoOk sm:inline-flex">
+                  <span class="h-1.5 w-1.5 rounded-full bg-tmoOk"></span> Rider
+                </span>
+              </button>
+
+              <button type="button"
+                      data-pill-value="later"
+                      role="radio"
+                      aria-checked="false"
+                      class="tmo-pill group relative flex w-full cursor-pointer items-center justify-center gap-2.5 rounded-2xl border border-tmoLine bg-[#FCFBF6] px-5 py-4 font-body text-[18px] font-bold text-tmoInkSoft select-none focus:outline-none focus:ring-4 focus:ring-tmoAccent/25 sm:py-5 sm:text-[19px]">
+                <svg class="pill-check h-4 w-4 shrink-0 text-tmoInk" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M4 10.5l3.5 3.5L16 5.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+                Not right now
+                <span class="pointer-events-none absolute right-3 top-3 hidden h-6 items-center rounded-full bg-tmoInk/8 px-2 py-0.5 font-body text-[10.5px] font-extrabold uppercase tracking-wider text-tmoMuted sm:inline-flex">
+                  Consider later
+                </span>
+              </button>
+            </div>
+            <p data-err-for="wouldPay" class="mt-2 hidden font-body text-[12.5px] font-semibold text-red-500"></p>
+          </fieldset>
+        </div>
+
+        <!-- Footer: Submit + success state -->
+        <div class="pt-2">
+          <button id="submitBtn"
+                  type="submit"
+                  class="group relative flex w-full items-center justify-center gap-2.5 overflow-hidden rounded-2xl bg-tmoAccent px-6 py-5 font-display text-[20px] font-extrabold tracking-[-0.3px] text-tmoInk shadow-[0_10px_30px_-12px_rgba(231,177,54,0.85)] disabled:cursor-not-allowed disabled:opacity-70 sm:text-[22px]">
+            <span id="submitLabel">Submit Suggestion</span>
+            <span id="submitSpinner" class="hidden h-5 w-5 animate-spin rounded-full border-[2.5px] border-tmoInk/25 border-t-tmoInk" aria-hidden="true"></span>
+            <!-- Progress shimmer -->
+            <span aria-hidden="true" class="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/45 to-transparent transition-transform duration-1000 group-hover:translate-x-full"></span>
+          </button>
+
+          <p id="formHint" class="mt-3 text-center font-body text-[12.5px] text-tmoMuted">
+            Your suggestion helps us plan new routes — we may follow up by phone.
+          </p>
+        </div>
+
+      </form>
+    </section>
+  </main>
+
+  <!-- ================= MODAL POPUPS ================= -->
+  <!-- Success popup -->
+  <div id="successPopup"
+       role="dialog"
+       aria-modal="true"
+       aria-labelledby="successPopupTitle"
+       class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-200 ease-out sm:p-6">
+    <div data-popup-backdrop class="absolute inset-0 bg-tmoInk/55 backdrop-blur-[6px]"></div>
+    <div role="document"
+         class="relative z-10 w-full max-w-md animate-popIn rounded-[26px] border border-tmoOk/35 bg-gradient-to-br from-white via-white to-tmoAccent/10 p-6 shadow-[0_30px_80px_-20px_rgba(10,31,24,0.6)] ring-1 ring-black/5 sm:p-8">
+      <button type="button" data-popup-close aria-label="Close" class="absolute right-3.5 top-3.5 grid h-9 w-9 place-items-center rounded-full bg-tmoInk/5 text-tmoInk/60 transition hover:bg-tmoInk hover:text-white focus:outline-none focus:ring-4 focus:ring-tmoAccent/40">
+        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="flex flex-col items-center text-center">
+        <div class="relative mb-5">
+          <div class="absolute -inset-3 rounded-full bg-tmoOk/15 blur-xl"></div>
+          <div class="relative grid h-[68px] w-[68px] place-items-center rounded-full bg-gradient-to-br from-tmoOk to-[#2e8f58] text-white shadow-[0_10px_28px_-10px_rgba(60,179,113,0.85)] ring-1 ring-white/70">
+            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M5 12.5l4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <h2 id="successPopupTitle" class="font-display text-[26px] font-extrabold leading-tight tracking-tight text-tmoInk sm:text-[28px]">
+          Suggestion received!
+        </h2>
+        <p class="mt-2 font-body text-[14.5px] leading-relaxed text-tmoInkSoft/75 sm:text-[15px]">
+          Thanks — your route suggestion is in. 🚍
+        </p>
+        <div class="mt-4 w-full rounded-2xl bg-tmoBg/45 px-4 py-3 ring-1 ring-black/5">
+          <p id="successBody" class="font-body text-[14px] leading-relaxed text-tmoInkSoft/85"></p>
+        </div>
+        <button type="button" data-popup-close class="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-tmoAccent px-5 py-3.5 font-display text-[17px] font-extrabold tracking-tight text-tmoInk shadow-[0_10px_26px_-12px_rgba(231,177,54,0.9)] transition hover:bg-[#F3BC35] active:scale-[.995] focus:outline-none focus:ring-4 focus:ring-tmoAccent/40 sm:w-auto sm:min-w-[220px]">
+          Got it, thanks
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error popup -->
+  <div id="errorPopup"
+       role="alertdialog"
+       aria-modal="true"
+       aria-labelledby="errorPopupTitle"
+       aria-describedby="errorPopupDesc"
+       class="pointer-events-none fixed inset-0 z-50 flex items-center justify-center p-4 opacity-0 transition-opacity duration-200 ease-out sm:p-6">
+    <div data-popup-backdrop class="absolute inset-0 bg-tmoInk/55 backdrop-blur-[6px]"></div>
+    <div role="document"
+         class="relative z-10 w-full max-w-md animate-popIn rounded-[26px] border border-red-300/60 bg-gradient-to-br from-white via-white to-red-50/40 p-6 shadow-[0_30px_80px_-20px_rgba(10,31,24,0.6)] ring-1 ring-black/5 sm:p-8">
+      <button type="button" data-popup-close aria-label="Close" class="absolute right-3.5 top-3.5 grid h-9 w-9 place-items-center rounded-full bg-tmoInk/5 text-tmoInk/60 transition hover:bg-red-500 hover:text-white focus:outline-none focus:ring-4 focus:ring-red-200">
+        <svg class="h-4 w-4" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+      </button>
+      <div class="flex flex-col items-center text-center">
+        <div class="relative mb-5">
+          <div class="absolute -inset-3 rounded-full bg-red-400/20 blur-xl"></div>
+          <div class="relative grid h-[68px] w-[68px] place-items-center rounded-full bg-gradient-to-br from-[#EF6B6B] to-[#C43F3F] text-white shadow-[0_10px_28px_-10px_rgba(196,63,63,0.85)] ring-1 ring-white/70">
+            <svg class="h-8 w-8" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M12 5l.12 9.2M12 18.5h.01" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+              <path d="M3.2 16.2L11 4.35a2.5 2.5 0 014.34.05l7.46 11.8a2.5 2.5 0 01-2.16 3.8H5.36a2.5 2.5 0 01-2.15-3.8z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </div>
+        </div>
+        <h2 id="errorPopupTitle" class="font-display text-[25px] font-extrabold leading-tight tracking-tight text-tmoInk sm:text-[27px]">
+          Couldn't send your suggestion.
+        </h2>
+        <p id="errorBody" class="mt-2 font-body text-[14.5px] leading-relaxed text-tmoInkSoft/75 sm:text-[15px]"></p>
+
+        <div class="mt-5 flex w-full flex-col items-stretch gap-2.5 sm:flex-row sm:justify-center">
+          <button id="retryBtn" type="button" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-tmoInk px-5 py-3.5 font-display text-[16.5px] font-extrabold tracking-tight text-white transition hover:bg-tmoInkSoft active:scale-[.995] focus:outline-none focus:ring-4 focus:ring-tmoInk/25 sm:min-w-[170px]">
+            <svg class="h-4.5 w-4.5" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+              <path d="M3 10a7 7 0 0112.6-3.4M17 3v4h-4M17 10a7 7 0 01-12.6 3.4M3 17v-4h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            Try again
+          </button>
+          <button type="button" data-popup-close class="inline-flex items-center justify-center rounded-2xl border border-tmoLine bg-white px-5 py-3.5 font-body text-[15px] font-bold text-tmoInk transition hover:bg-tmoBg/40 active:scale-[.995] focus:outline-none focus:ring-4 focus:ring-tmoAccent/30 sm:min-w-[150px]">
+            Close
+          </button>
+        </div>
+        <p id="errorPopupDesc" class="mt-4 font-body text-[12.5px] text-tmoMuted">Your data is kept locally until it's sent.</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      const form = document.getElementById('suggestRouteForm');
+      const wouldPayInput = document.getElementById('wouldPay');
+      const pills = form.querySelectorAll('[data-pill-value]');
+      const submitBtn = document.getElementById('submitBtn');
+      const submitLabel = document.getElementById('submitLabel');
+      const submitSpinner = document.getElementById('submitSpinner');
+      const successPopup = document.getElementById('successPopup');
+      const errorPopup   = document.getElementById('errorPopup');
+      const successBody  = document.getElementById('successBody');
+      const errorBody    = document.getElementById('errorBody');
+      const retryBtn     = document.getElementById('retryBtn');
+      const formHint     = document.getElementById('formHint');
+      let lastFocus = null;
+
+      // ---- Popup helpers ----
+      function openPopup(popupEl) {
+        if (!popupEl) return;
+        try { lastFocus = document.activeElement; } catch (_) {}
+        popupEl.classList.remove('pointer-events-none', 'opacity-0');
+        // Replay pop-in animation on the card
+        const card = popupEl.querySelector('[role="document"]');
+        if (card) {
+          try { card.classList.remove('animate-popIn'); void card.offsetWidth; } catch (_) {}
+          card.classList.add('animate-popIn');
+        }
+        try { document.body.style.overflow = 'hidden'; } catch (_) {}
+        // Move focus to first actionable element
+        const focusable = popupEl.querySelector('[data-popup-close], button:not([disabled])');
+        if (focusable && typeof focusable.focus === 'function') {
+          try { setTimeout(function(){ focusable.focus({ preventScroll: true }); }, 30); }
+          catch (_) { try { setTimeout(function(){ focusable.focus(); }, 30); } catch (e2) {} }
+        }
+      }
+      function closePopup(popupEl) {
+        if (!popupEl) return;
+        popupEl.classList.add('pointer-events-none', 'opacity-0');
+        try {
+          const sp = document.getElementById('successPopup');
+          const ep = document.getElementById('errorPopup');
+          const bothClosed =
+            sp && sp.classList.contains('opacity-0') &&
+            ep && ep.classList.contains('opacity-0');
+          if (bothClosed) document.body.style.overflow = '';
+        } catch (_) {}
+        if (lastFocus && typeof lastFocus.focus === 'function') {
+          try { lastFocus.focus({ preventScroll: true }); }
+          catch (_) { try { lastFocus.focus(); } catch (e2) {} }
+        }
+      }
+      function closeAllPopups() {
+        [successPopup, errorPopup].forEach(closePopup);
+      }
+      // Wire close buttons + backdrop clicks for each popup
+      [successPopup, errorPopup].forEach(popup => {
+        popup.querySelectorAll('[data-popup-close]').forEach(btn =>
+          btn.addEventListener('click', () => closePopup(popup))
+        );
+        popup.querySelector('[data-popup-backdrop]')?.addEventListener('click', () => closePopup(popup));
+      });
+      // Close on Escape key
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') closeAllPopups();
+      });
+
+      // ---- Pill interactions ----
+      pills.forEach(pill => {
+        pill.addEventListener('click', () => {
+          const val = pill.getAttribute('data-pill-value');
+          pills.forEach(p => {
+            const active = (p === pill);
+            p.setAttribute('data-active', active ? 'true' : 'false');
+            p.setAttribute('aria-checked', active ? 'true' : 'false');
+          });
+          wouldPayInput.value = val;
+          clearErr('wouldPay');
+        });
+        pill.addEventListener('keydown', (e) => {
+          if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); pill.click(); }
+        });
+      });
+
+      // ---- Helpers ----
+      function setErr(field, msg) {
+        const el = form.querySelector(`[data-err-for="${field}"]`);
+        if (!el) return;
+        el.textContent = msg;
+        el.classList.remove('hidden');
+        const input = form.querySelector(`#${field}`);
+        if (input) {
+          input.parentElement.classList.add('!border-red-400', '!bg-red-50/40', 'animate-shake');
+          setTimeout(() => input.parentElement.classList.remove('animate-shake'), 400);
+        }
+      }
+      function clearErr(field) {
+        const el = form.querySelector(`[data-err-for="${field}"]`);
+        if (el) { el.textContent = ''; el.classList.add('hidden'); }
+        const input = form.querySelector(`#${field}`);
+        if (input) input.parentElement.classList.remove('!border-red-400', '!bg-red-50/40');
+      }
+      function formatPhone(raw) {
+        let digits = (raw || '').replace(/\D/g, '').slice(0, 11);
+        // Auto-format: 0913 446 6287
+        return digits.replace(/^(\d{0,4})(\d{0,3})(\d{0,4})$/, (m, a, b, c) =>
+          [a, b, c].filter(Boolean).join(' ')).trim();
+      }
+      function looksLikeNgPhone(s) {
+        const d = (s || '').replace(/\D/g, '');
+        return /^(?:0[789]\d{9}|234[789]\d{9})$/.test(d);
+      }
+
+      // ---- Field bindings ----
+      const phoneInput = document.getElementById('phone');
+      let phoneLastVal = '';
+      phoneInput.addEventListener('input', () => {
+        if (phoneInput.value === phoneLastVal) return;
+        phoneInput.value = formatPhone(phoneInput.value);
+        phoneLastVal = phoneInput.value;
+        if (phoneInput.value) clearErr('phone');
+      });
+      ['fullName', 'routeStart', 'routeEnd'].forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener('input', () => el.value && clearErr(id));
+      });
+
+      // ---- Validate ----
+      function validate() {
+        let ok = true;
+        const name = document.getElementById('fullName').value.trim();
+        if (name.length < 2) { setErr('fullName', 'Please enter your full name (at least 2 characters).'); ok = false; }
+        const phone = document.getElementById('phone').value;
+        if (!looksLikeNgPhone(phone)) { setErr('phone', 'Please enter a valid Nigerian 11-digit mobile number.'); ok = false; }
+        const start = document.getElementById('routeStart').value.trim();
+        if (start.length < 2) { setErr('routeStart', 'Tell us where the route starts (e.g. Ikorodu).'); ok = false; }
+        const end = document.getElementById('routeEnd').value.trim();
+        if (end.length < 2) { setErr('routeEnd', 'Tell us where the route ends (e.g. CMS Marina).'); ok = false; }
+        if (end.toLowerCase() === start.toLowerCase() && start.length > 1) {
+          setErr('routeEnd', 'Start and end should be different stops.'); ok = false;
+        }
+        if (!wouldPayInput.value) { setErr('wouldPay', 'Please choose an option so we can plan demand.'); ok = false; }
+        return ok;
+      }
+
+      const ENDPOINT = 'https://api.cmstaxiandmotor.com/api/suggest-route';
+      let lastPayload  = null;
+
+      function buildPayload() {
+        return {
+          fullName: document.getElementById('fullName').value.trim(),
+          phone: document.getElementById('phone').value,
+          routeStart: document.getElementById('routeStart').value.trim(),
+          routeEnd: document.getElementById('routeEnd').value.trim(),
+          wouldPay: wouldPayInput.value,
+          submittedAt: new Date().toISOString()
+        };
+      }
+
+      function showSuccess(payload) {
+        submitSpinner.classList.add('hidden');
+        submitLabel.textContent = 'Suggestion sent ✓';
+        formHint && formHint.classList.add('hidden');
+        successBody.textContent =
+          `We noted the ${capitalize(payload.routeStart)} → ${capitalize(payload.routeEnd)} corridor. ` +
+          (payload.wouldPay === 'yes'
+            ? "Great to hear you'd ride — we'll factor your interest into expansion plans."
+            : "We get it — when the route launches you'll be the first to know.");
+        submitBtn.disabled = true;
+        closePopup(errorPopup);
+        openPopup(successPopup);
+        const card = document.getElementById('routeFormCard');
+        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function showError(msg, recoverable) {
+        submitSpinner.classList.add('hidden');
+        submitBtn.disabled = false;
+        submitLabel.textContent = 'Submit Suggestion';
+        if (errorBody) errorBody.textContent = msg || 'Something went wrong contacting the server.';
+        if (retryBtn) {
+          if (recoverable === false) retryBtn.classList.add('hidden');
+          else retryBtn.classList.remove('hidden');
+        }
+        closePopup(successPopup);
+        openPopup(errorPopup);
+      }
+
+      async function postRoute(payload) {
+        const res = await fetch(ENDPOINT, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify(payload)
+        });
+        let data = null;
+        try { data = await res.json(); } catch (_) { /* ignore */ }
+        if (!res.ok) {
+          const serverMsg = data && (data.message || data.error || (typeof data === 'string' ? data : null));
+          const err = new Error(serverMsg || `Server responded with status ${res.status}`);
+          err.status = res.status;
+          err.recoverable = res.status >= 500 || res.status === 0 || res.status === 408 || res.status === 429;
+          throw err;
+        }
+        return data;
+      }
+
+      // ---- Submit ----
+      async function doSubmit() {
+        if (!validate()) return;
+
+        closeAllPopups();
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove('hidden');
+        submitLabel.textContent = 'Sending…';
+
+        const payload = buildPayload();
+        lastPayload = payload;
+
+        try {
+          await postRoute(payload);
+          showSuccess(payload);
+        } catch (err) {
+          const recoverable = err.recoverable !== false;
+          const fallback = err.status
+            ? `The service returned status ${err.status}. Please try again in a moment.`
+            : "We couldn't reach the service. Check your connection and try again.";
+          showError(err.message || fallback, recoverable);
+        }
+      }
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        doSubmit();
+      });
+
+      retryBtn && retryBtn.addEventListener('click', function () {
+        if (lastPayload) {
+          // Restore last good payload in case user cleared fields (fields stay editable too)
+          document.getElementById('fullName').value = lastPayload.fullName;
+          document.getElementById('phone').value = lastPayload.phone;
+          document.getElementById('routeStart').value = lastPayload.routeStart;
+          document.getElementById('routeEnd').value = lastPayload.routeEnd;
+          wouldPayInput.value = lastPayload.wouldPay;
+          pills.forEach(p => {
+            const active = p.getAttribute('data-pill-value') === lastPayload.wouldPay;
+            p.setAttribute('data-active', active ? 'true' : 'false');
+            p.setAttribute('aria-checked', active ? 'true' : 'false');
+          });
+        }
+        doSubmit();
+      });
+
+      function capitalize(s) {
+        s = String(s || '');
+        return s.charAt(0).toUpperCase() + s.slice(1);
+      }
+    })();
+  </script>
+</body>
+</html>
